@@ -1,0 +1,26 @@
+"Famiglia FISSURELLIDAE" B
+"Diodora demartiniorum Buzzurro & Russo, 2004"
+
+"Famiglia SKENEIDAE"
+"Dasyskenea suavis Fasulo & Cretella, 2003 "
+
+"Famiglia RISSOIDAE"
+"Alvania arguta Caziot & Locard, 1900 ex Monterosato ms."
+
+"Famiglia VERMETIDAE"
+"Petalopoma elisabettae Schiaparelli, 2002 "
+
+"Famiglia CERITHIOPSIDAE" EU
+"Cerithiopsis annae Cecalupo & Buzzurro, 2005"
+
+"Famiglia MATHILDIDAE"
+"Mathilda barbadensis Dall, 1889"
+
+"Famiglia RETUSIDAE"
+"Retusa desgenetti (Audouin, 1826)"
+
+"Famiglia MYTILIDAE"
+"Septifer forskali Dunker, 1855"
+
+"Famiglia PECTINIDAE"
+"Semipallium coruscans coruscans (Hinds, 1845)"

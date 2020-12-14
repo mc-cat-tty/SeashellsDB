@@ -788,7 +788,7 @@
 "Bolinus cornutus (Linné, 1758)"
 "Dermomurex scalaroides (Blainville, 1829)"
 "Hadriania oretea (De Gregorio, 1885)"
-"Hexaplex pecchiolanus (D’Ancona, 1871)"
+"Hexaplex pecchiolanus (D'Ancona, 1871)"
 "Hexaplex trunculus (Linné, 1758)"
 "Ergalatax obscura Houart, 1996"
 "Orania fusulus (Brocchi, 1814)"
@@ -2124,7 +2124,7 @@
 "Lepidopleurus cajetanus (Poli, 1791)"
 "Lepidopleurus algesirensis (Capellini, 1859)"
 "Lepidopleurus asellus (Gmelin, 1791)"
-"Lepidopleurus bedullii (Dell’Angelo & Palazzi, 1986)"
+"Lepidopleurus bedullii (Dell'Angelo & Palazzi, 1986)"
 "Lepidopleurus cancellatus (Sowerby G.B.II, 1840)"
 "Lepidopleurus cimicoides (Monterosato, 1879)"
 "Lepidopleurus geronensis (Kaas & Van Belle, 1985)"
@@ -2141,7 +2141,7 @@
 "Famiglia ISCHNOCHITONIDAE" BE
 "Ischnochiton dolii Van Belle & Dell'Angelo, 1998"
 "Ischnochiton rissoi (Payraudeau, 1826)"
-"Ischnochiton usticensis Dell’Angelo & Castriota, 1999"
+"Ischnochiton usticensis Dell'Angelo & Castriota, 1999"
 "Ischnochiton vanbellei Kaas, 1985"
 
 "Famiglia CALLISTOCHITON"
@@ -2190,36 +2190,9 @@
 "Todarus sagittatus Steenstrup, 1856"
 
 "Famiglia ARGONAUTIDAE" CV
-"Argonauta argo Linné, C3911758"
+"Argonauta argo Linné, 1758"
 
 "Classe MONOPLACOPHORA"
 
 "Famiglia NEOPILINIDAE"
 "Neopilina zografi (Dautzenberg & Fischer P., 1896)"
-
-"Famiglia FISSURELLIDAE" B
-"Diodora demartiniorum Buzzurro & Russo, 2004"
-
-"Famiglia SKENEIDAE"
-"Dasyskenea suavis Fasulo & Cretella, 2003 "
-
-"Famiglia RISSOIDAE"
-"Alvania arguta Caziot & Locard, 1900 ex Monterosato ms."
-
-"Famiglia VERMETIDAE"
-"Petalopoma elisabettae Schiaparelli, 2002 "
-
-"Famiglia CERITHIOPSIDAE" EU
-"Cerithiopsis annae Cecalupo & Buzzurro, 2005"
-
-"Famiglia MATHILDIDAE"
-"Mathilda barbadensis Dall, 1889"
-
-"Famiglia RETUSIDAE"
-"Retusa desgenetti (Audouin, 1826)"
-
-"Famiglia MYTILIDAE"
-"Septifer forskali Dunker, 1855"
-
-"Famiglia PECTINIDAE"
-"Semipallium coruscans coruscans (Hinds, 1845)"
