@@ -8,12 +8,14 @@ import argparse
 import logging
 import re
 import string
+import mariadb
 from enum import Enum
 from typing import List, Sequence, Tuple
 
 FILENAME: str = "Elenco.txt"
 HOST, PORT = "localhost", 3306
 USERNAME, PASSWORD = "writeUser", ""  # Please change these parameters to yours, or pass them through the command line
+DATABASE: str = "conchiglie"
 
 
 class DataType(Enum):
@@ -67,8 +69,34 @@ class Parser:
                                       parsed_example[2]]  # Year
 
 
+class DBConnector:
+    def __init__(self, host: str, port: int, username: str, password: str, database: str):
+        try:
+            self.conn = mariadb.connect(
+                user=username,
+                password=password,
+                host=host,
+                port=port,
+                database=database
 
-def main(filename: str, host: str, port: int, username: str, password: str) -> None:
+            )
+        except mariadb.Error as e:
+            logging.error(f"Error connecting to MariaDB Server")
+        else:
+            self.cur: mariadb = self.conn.cursor()
+
+    def insert_class(self, class_name: str):
+        self.cur.execute("INSERT INTO genere (nome) VALUES (?)", (class_name))
+
+    def insert_family(self, family_name: str, family_code: str):
+        self.cur.execute("INSERT INTO famiglia (nome, codice) VALUES (?, ?)", (family_name, family_code))
+
+    def insert_species(self, species_name: str, discoverer: str, year: int):
+        self.cur.execute("INSERT INTO specie (nome, ritrovatore, anno_ritrovamento) VALUES (?, ?, ?)", (species_name, discoverer, year))
+
+
+def main(filename: str, host: str, port: int, username: str, password: str, database: str) -> None:
+    db_connector = DBConnector(host, port, username, password, database)
     parser: Parser = Parser()
     with open(filename, "r") as file:
         lines: List[str] = file.readlines()
@@ -94,5 +122,6 @@ if __name__ == "__main__":
     parser.add_argument("-P", "--port", help="MariaDB (MySQL) server port number", default=PORT, type=int, dest="port")  # Notice that this flag is uppercase
     parser.add_argument("-u", "--username", help="MariaDB (MySQL) username", default=USERNAME, type=str, dest="username")
     parser.add_argument("-p", "--password", help="MariaDB (MySQL) password", default=PASSWORD, type=str, dest="password")
+    parser.add_argument("-d", "--database", help="MariaDB (MySQL) database to be used", default=DATABASE, type=str, dest="database")
     args = parser.parse_args()
-    main(args.filename, args.host, args.port, args.username, args.password)
+    main(args.filename, args.host, args.port, args.username, args.password, args.database)
