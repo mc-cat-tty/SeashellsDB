@@ -86,33 +86,35 @@ class DBConnector:
             self.cur: mariadb = self.conn.cursor()
 
     def insert_class(self, class_name: str):
-        self.cur.execute("INSERT INTO genere (nome) VALUES (?)", (class_name))
+        self.cur.execute("INSERT INTO genere (nome) VALUES (?)", class_name)
 
-    def insert_family(self, family_name: str, family_code: str):
-        self.cur.execute("INSERT INTO famiglia (nome, codice) VALUES (?, ?)", (family_name, family_code))
+    def insert_family(self, family_name: str, family_code: str, class_id: int):
+        self.cur.execute("INSERT INTO famiglia (nome, codice, genere_id) VALUES (?, ?, ?)", (family_name, family_code, class_id))
 
     def insert_species(self, species_name: str, discoverer: str, year: int):
         self.cur.execute("INSERT INTO specie (nome, ritrovatore, anno_ritrovamento) VALUES (?, ?, ?)", (species_name, discoverer, year))
 
+    def get_last_inserted_id(self):
+        return self.cur.execute("SELECT SCOPE_IDENTITY()")
+
 
 def main(filename: str, host: str, port: int, username: str, password: str, database: str) -> None:
-    db_connector = DBConnector(host, port, username, password, database)
-    parser: Parser = Parser()
-    with open(filename, "r") as file:
-        lines: List[str] = file.readlines()
-    for line in lines:
-        try:
-            data_type, data = parser.parse_line(line)
-        except:
-            logging.error(f"{line} NOT IMPORTED")
-        else:
-            if data_type == DataType.BLANK_LINE:
-                logging.info(f"{data_type} discarded")
-            else:
-                logging.info(f"{data_type} {data} imported")
-
-
-
+    db_connector: DBConnector = DBConnector(host, port, username, password, database)
+    # line_parser: Parser = Parser()
+    # with open(filename, "r") as file:
+    #     lines: List[str] = file.readlines()
+    # for line in lines:
+    #     try:
+    #         data_type, data = line_parser.parse_line(line)
+    #     except:
+    #         logging.error(f"{line} NOT IMPORTED")
+    #     else:
+    #         if data_type == DataType.BLANK_LINE:
+    #             logging.info(f"{data_type} discarded")
+    #         else:
+    #             logging.info(f"{data_type} {data} imported")
+    db_connector.insert_class("TEST")
+    db_connector.insert_family()
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(levelname)s: %(message)s")
