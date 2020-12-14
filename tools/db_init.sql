@@ -39,6 +39,8 @@ create table specie
     famiglia_id int unsigned not null,
     id          int unsigned auto_increment
         primary key,
+    ritrovatore       varchar(50)  not null,
+    anno_ritrovamento int unsigned not null,
     constraint nome
         unique (nome),
     constraint specie_ibfk_1
