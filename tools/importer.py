@@ -3,3 +3,79 @@ In order to populate the database, first we have to convert data from a taxonomy
 """
 
 __author__ = "Francesco Mecatti"
+
+import argparse
+import logging
+import re
+import string
+from enum import Enum
+from typing import List, Sequence, Tuple
+
+FILENAME: str = "Elenco.txt"
+HOST, PORT = "localhost", 3306
+USERNAME, PASSWORD = "writeUser", ""  # Please change these parameters to yours, or pass them through the command line
+
+
+class DataType(Enum):
+    BLANK_LINE = 0
+    CLASS = 1
+    FAMILY = 2
+    SPECIES = 3
+    EXAMPLE = 4
+
+class Parser:
+    def __init__(self, line_structure: str = r"^\"(\w+?) ([\s\w\d,]+)\"[ \w]*$") -> None:
+        self.line_structure: str = line_structure
+        self.current_class: str = ""
+        self.current_family: str = ""
+        self.current_species: str = ""
+        self.current_family_code = "AA"
+
+    def next_family_code(self) -> str:
+        """
+        This method provides a generator for the unique family code. I starts from AA identifier
+        :return: next family code
+        """
+        for first_char in string.ascii_uppercase:
+            for second_char in string.ascii_uppercase:
+                self.current_family_code = first_char+second_char
+                yield first_char+second_char
+
+    def parse_line(self, line: str) -> Tuple[DataType, List[str]]:
+        """
+        Regex based line parsers
+        :param line: line to be parsed
+        :return: parsed line; namely a list of all the different elements, according to the type of line (class, family, species or example)
+        """
+        if not line:
+            return DataType.BLANK_LINE, []
+        parsed_line: Sequence[str] = re.match(self.line_structure, line).groups()
+        if parsed_line[0] == "Classe":
+            self.current_class = parsed_line[1]
+            return DataType.CLASS, [self.current_class]
+        elif parsed_line[0] == "Famiglia":
+            self.current_family = parsed_line[1]
+            self.current_family_code = next(self.next_family_code())
+            return DataType.FAMILY, [self.current_family, self.current_family_code]
+        else:
+            parsed_example = re.match(r"^([ a-z]+)[ \(]*([\w \.&']+), ?(\d+)[\) ]*", parsed_line[1].strip()).groups()
+            return DataType.SPECIES, [parsed_line[0]+parsed_example[0],  # Name
+                                      parsed_example[1],  # Discoverer
+                                      parsed_example[2]]  # Year
+
+
+
+def main(filename: str, host: str, port: int, username: str, password: str) -> None:
+    pass
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s: %(message)s")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-f", "--filename", help="Filename path", default=FILENAME, type=str, dest="filename")
+    parser.add_argument("-h", "--host", help="MariaDB (MySQL) server address", default=HOST, type=str, dest="host")
+    parser.add_argument("-P", "--port", help="MariaDB (MySQL) server port number", default=PORT, type=int, dest="port")  # Notice that this flag is uppercase
+    parser.add_argument("-u", "--username", help="MariaDB (MySQL) username", default=USERNAME, type=str, dest="username")
+    parser.add_argument("-p", "--password", help="MariaDB (MySQL) password", default=PASSWORD, type=str, dest="password")
+    args = parser.parse_args()
+    main(args.filename, args.host, args.port, args.username, args.password)
