@@ -139,21 +139,19 @@ class DBConnector:
 
 def main(filename: str, host: str, port: int, username: str, password: str, database: str) -> None:
     db_connector: DBConnector = DBConnector(host, port, username, password, database)
-    # line_parser: Parser = Parser()
-    # with open(filename, "r") as file:
-    #     lines: List[str] = file.readlines()
-    # for line in lines:
-    #     try:
-    #         data_type, data = line_parser.parse_line(line)
-    #     except:
-    #         logging.error(f"{line} NOT IMPORTED")
-    #     else:
-    #         if data_type == DataType.BLANK_LINE:
-    #             logging.info(f"{data_type} discarded")
-    #         else:
-    #             logging.info(f"{data_type} {data} imported")
-    db_connector.insert_class("CLASS")
-    db_connector.insert_family("FAMILY", "AA")
+    line_parser: Parser = Parser()
+    with open(filename, "r") as file:
+        lines: List[str] = file.readlines()
+    for line in lines:
+        try:
+            data_type, data = line_parser.parse_line(line)
+        except:
+            logging.error(f"{line} NOT IMPORTED")
+        else:
+            if data_type == DataType.BLANK_LINE:
+                logging.info(f"{data_type} discarded")
+            else:
+                logging.info(f"{data_type} {data} imported")
 
 
 if __name__ == "__main__":
