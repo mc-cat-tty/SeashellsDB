@@ -70,8 +70,11 @@ class Parser:
 
 
 class DBConnector:
-    def __init__(self, host: str, port: int, username: str, password: str, database: str):
+    def __init__(self, host: str, port: int, username: str, password: str, database: str) -> None:
         try:
+            self.last_inserted_class_id = None
+            self.last_inserted_family_id = None
+            self.last_inserted_species_id = None
             logging.debug(f"Connecting to the server\n\thost: {host}\t\tport: {port}\n\tusername: {username}\tpassword: {password}\n\tdatabase: {database}")
             self.conn = mariadb.connect(
                 user=username,
@@ -88,21 +91,46 @@ class DBConnector:
         else:
             self.cur = self.conn.cursor()
 
-    def __del__(self):
+    def __del__(self) -> None:
         self.conn.close()
 
-    def insert_class(self, class_name: str):
+    def insert_class(self, class_name: str) -> None:
+        """
+        Method to insert a row into class table
+        :param class_name: name of the class; unique
+        """
         logging.debug(f'INSERT INTO genere (nome) VALUES ("{class_name}")')
         self.cur.execute('INSERT INTO genere (nome) VALUES (?)', [class_name])
+        self.last_inserted_class_id = self.get_last_inserted_id()
 
-    def insert_family(self, family_name: str, family_code: str, class_id: int):
+    def insert_family(self, family_name: str, family_code: str, class_id: int = None) -> None:
+        """
+        Method to insert a row into family table
+        :param family_name: name of the family; unique
+        :param family_code: code of the family; unique
+        :param class_id: id of parent class; foreign key; leave it blank if you are inserting a family that belongs to the last inserted class
+        """
+        if class_id is None:
+            class_id = self.last_inserted_class_id
         logging.debug(f'INSERT INTO famiglia (nome, codice, genere_id) VALUES ("{family_name}", "{family_code}", "{class_id}")')
         self.cur.execute('INSERT INTO famiglia (nome, codice, genere_id) VALUES (?, ?, ?)', [family_name, family_code, class_id])
+        self.last_inserted_family_id = self.get_last_inserted_id()
 
-    def insert_species(self, species_name: str, discoverer: str, year: int, family_id: int):
+    def insert_species(self, species_name: str, discoverer: str, year: int, family_id: int = None) -> None:
+        """
+        Method to insert a row into species table
+        :param species_name: species name; unique
+        :param discoverer: who discovered the species for the first time
+        :param year: year in which the species has been discovered
+        :param family_id: id of parent family; foreign key; leave it blank if you are inserting a species that belongs to the last inserted family
+        :return:
+        """
+        if family_id is None:
+            family_id = self.last_inserted_family_id
         self.cur.execute('INSERT INTO specie (nome, ritrovatore, anno_ritrovamento, famiglia_id) VALUES (?, ?, ?, ?)', [species_name, discoverer, year, family_id])
+        self.last_inserted_species_id = self.get_last_inserted_id()
 
-    def get_last_inserted_id(self):
+    def get_last_inserted_id(self) -> int:
         self.cur.execute('SELECT @@IDENTITY')
         last_id = self.cur.fetchone()[0]
         logging.debug(f"Retrieved last id: {last_id}")
@@ -125,11 +153,11 @@ def main(filename: str, host: str, port: int, username: str, password: str, data
     #         else:
     #             logging.info(f"{data_type} {data} imported")
     db_connector.insert_class("CLASS")
-    db_connector.insert_family("FAMILY", "AA", db_connector.get_last_inserted_id())
+    db_connector.insert_family("FAMILY", "AA")
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s: %(message)s")
+    logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(levelname)s: %(message)s")
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--filename", help="Filename path", default=FILENAME, type=str, dest="filename")
     parser.add_argument("-a", "--address", help="MariaDB (MySQL) server address", default=HOST, type=str, dest="host")
