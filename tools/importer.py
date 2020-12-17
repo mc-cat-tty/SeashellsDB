@@ -13,7 +13,7 @@ from enum import Enum
 from typing import List, Sequence, Tuple
 
 FILENAME: str = "Elenco.txt"
-HOST, PORT = "localhost", 3306
+HOST, PORT = "127.0.0.1", 3306
 USERNAME, PASSWORD = "writeUser", ""  # Please change these parameters to yours, or pass them through the command line
 DATABASE: str = "conchiglie"
 
@@ -72,6 +72,7 @@ class Parser:
 class DBConnector:
     def __init__(self, host: str, port: int, username: str, password: str, database: str):
         try:
+            logging.debug(f"Connecting to the server\n\thost: {host}\t\tport: {port}\n\tusername: {username}\tpassword: {password}\n\tdatabase: {database}")
             self.conn = mariadb.connect(
                 user=username,
                 password=password,
@@ -80,22 +81,32 @@ class DBConnector:
                 database=database
 
             )
+            self.conn.autocommit = True
         except mariadb.Error as e:
             logging.error(f"Error connecting to MariaDB Server")
+            exit(1)
         else:
-            self.cur: mariadb = self.conn.cursor()
+            self.cur = self.conn.cursor()
+
+    def __del__(self):
+        self.conn.close()
 
     def insert_class(self, class_name: str):
-        self.cur.execute("INSERT INTO genere (nome) VALUES (?)", class_name)
+        logging.debug(f'INSERT INTO genere (nome) VALUES ("{class_name}")')
+        self.cur.execute('INSERT INTO genere (nome) VALUES (?)', [class_name])
 
     def insert_family(self, family_name: str, family_code: str, class_id: int):
-        self.cur.execute("INSERT INTO famiglia (nome, codice, genere_id) VALUES (?, ?, ?)", (family_name, family_code, class_id))
+        logging.debug(f'INSERT INTO famiglia (nome, codice, genere_id) VALUES ("{family_name}", "{family_code}", "{class_id}")')
+        self.cur.execute('INSERT INTO famiglia (nome, codice, genere_id) VALUES (?, ?, ?)', [family_name, family_code, class_id])
 
-    def insert_species(self, species_name: str, discoverer: str, year: int):
-        self.cur.execute("INSERT INTO specie (nome, ritrovatore, anno_ritrovamento) VALUES (?, ?, ?)", (species_name, discoverer, year))
+    def insert_species(self, species_name: str, discoverer: str, year: int, family_id: int):
+        self.cur.execute('INSERT INTO specie (nome, ritrovatore, anno_ritrovamento, famiglia_id) VALUES (?, ?, ?, ?)', [species_name, discoverer, year, family_id])
 
     def get_last_inserted_id(self):
-        return self.cur.execute("SELECT SCOPE_IDENTITY()")
+        self.cur.execute('SELECT @@IDENTITY')
+        last_id = self.cur.fetchone()[0]
+        logging.debug(f"Retrieved last id: {last_id}")
+        return last_id
 
 
 def main(filename: str, host: str, port: int, username: str, password: str, database: str) -> None:
@@ -113,11 +124,12 @@ def main(filename: str, host: str, port: int, username: str, password: str, data
     #             logging.info(f"{data_type} discarded")
     #         else:
     #             logging.info(f"{data_type} {data} imported")
-    db_connector.insert_class("TEST")
-    db_connector.insert_family()
+    db_connector.insert_class("CLASS")
+    db_connector.insert_family("FAMILY", "AA", db_connector.get_last_inserted_id())
+
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(levelname)s: %(message)s")
+    logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s: %(message)s")
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--filename", help="Filename path", default=FILENAME, type=str, dest="filename")
     parser.add_argument("-a", "--address", help="MariaDB (MySQL) server address", default=HOST, type=str, dest="host")
