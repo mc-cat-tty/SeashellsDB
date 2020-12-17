@@ -64,7 +64,7 @@ class Parser:
             return DataType.FAMILY, [self.current_family, self.current_family_code]
         else:
             parsed_example: Sequence[str] = re.match(r"^([ a-z\.]+)[ \(]*([\w \.&'\-,]+), ?(\d+)[\) ]*", parsed_line[1].strip()).groups()
-            return DataType.SPECIES, [parsed_line[0]+parsed_example[0],  # Name
+            return DataType.SPECIES, [parsed_line[0] + " " + parsed_example[0],  # Name
                                       parsed_example[1],  # Discoverer
                                       parsed_example[2]]  # Year
 
@@ -145,10 +145,16 @@ def main(filename: str, host: str, port: int, username: str, password: str, data
     for line in lines:
         try:
             data_type, data = line_parser.parse_line(line)
+            if data_type is DataType.CLASS:
+                db_connector.insert_class(data[0])
+            elif data_type is DataType.FAMILY:
+                db_connector.insert_family(data[0], data[1])
+            elif data_type is DataType.SPECIES:
+                db_connector.insert_species(data[0], data[1], int(data[2]))
         except:
             logging.error(f"{line} NOT IMPORTED")
         else:
-            if data_type == DataType.BLANK_LINE:
+            if data_type is DataType.BLANK_LINE:
                 logging.info(f"{data_type} discarded")
             else:
                 logging.info(f"{data_type} {data} imported")
