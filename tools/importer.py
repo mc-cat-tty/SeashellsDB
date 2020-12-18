@@ -42,14 +42,15 @@ class Parser:
         """
         for first_char in string.ascii_uppercase:
             for second_char in string.ascii_uppercase:
-                self.current_family_code = first_char+second_char
+                self.current_family_code = first_char + second_char
                 yield first_char + second_char
 
     def parse_line(self, line: str) -> Tuple[DataType, List[str]]:
         """
         Regex based line parsers
         :param line: line to be parsed
-        :return: parsed line; namely a list of all the different elements, according to the type of line (class, family, species or example)
+        :return: parsed line; namely a list of all the different elements, according to the
+        type ofline (class,family, species or example)
         """
         logging.info(f"Parsing {line}")
         if not line or line == "\n":
@@ -63,7 +64,8 @@ class Parser:
             self.current_family_code = next(self.gen)
             return DataType.FAMILY, [self.current_family, self.current_family_code]
         else:
-            parsed_example: Sequence[str] = re.match(r"^([ a-z\.]+)[ \(]*([\w \.&'\-,]+), ?(\d+)[\) ]*", parsed_line[1].strip()).groups()
+            parsed_example: Sequence[str] = re.match(r"^([ a-z\.]+)[ \(]*([\w \.&'\-,]+), ?(\d+)[\) ]*",
+                                                     parsed_line[1].strip()).groups()
             return DataType.SPECIES, [parsed_line[0] + " " + parsed_example[0],  # Name
                                       parsed_example[1],  # Discoverer
                                       parsed_example[2]]  # Year
@@ -75,7 +77,9 @@ class DBConnector:
             self.last_inserted_class_id = None
             self.last_inserted_family_id = None
             self.last_inserted_species_id = None
-            logging.debug(f"Connecting to the server\n\thost: {host}\t\tport: {port}\n\tusername: {username}\tpassword: {password}\n\tdatabase: {database}")
+            logging.debug(
+                f"Connecting to the server\n\thost: {host}\t\tport: {port}\n"
+                f"\tusername: {username}\tpassword: {password}\n\tdatabase: {database}")
             self.conn = mariadb.connect(
                 user=username,
                 password=password,
@@ -108,12 +112,15 @@ class DBConnector:
         Method to insert a row into family table
         :param family_name: name of the family; unique
         :param family_code: code of the family; unique
-        :param class_id: id of parent class; foreign key; leave it blank if you are inserting a family that belongs to the last inserted class
+        :param class_id: id of parent class; foreign key; leave it blank if you are inserting a family that belongs to
+        the last inserted class
         """
         if class_id is None:
             class_id = self.last_inserted_class_id
-        logging.debug(f'INSERT INTO famiglia (nome, codice, genere_id) VALUES ("{family_name}", "{family_code}", "{class_id}")')
-        self.cur.execute('INSERT INTO famiglia (nome, codice, genere_id) VALUES (?, ?, ?)', [family_name, family_code, class_id])
+        logging.debug(
+            f'INSERT INTO famiglia (nome, codice, genere_id) VALUES ("{family_name}", "{family_code}", "{class_id}")')
+        self.cur.execute('INSERT INTO famiglia (nome, codice, genere_id) VALUES (?, ?, ?)',
+                         [family_name, family_code, class_id])
         self.last_inserted_family_id = self.get_last_inserted_id()
 
     def insert_species(self, species_name: str, discoverer: str, year: int, family_id: int = None) -> None:
@@ -122,12 +129,14 @@ class DBConnector:
         :param species_name: species name; unique
         :param discoverer: who discovered the species for the first time
         :param year: year in which the species has been discovered
-        :param family_id: id of parent family; foreign key; leave it blank if you are inserting a species that belongs to the last inserted family
+        :param family_id: id of parent family; foreign key; leave it blank if you are inserting a species that belongs
+        to the last inserted family
         :return:
         """
         if family_id is None:
             family_id = self.last_inserted_family_id
-        self.cur.execute('INSERT INTO specie (nome, ritrovatore, anno_ritrovamento, famiglia_id) VALUES (?, ?, ?, ?)', [species_name, discoverer, year, family_id])
+        self.cur.execute('INSERT INTO specie (nome, ritrovatore, anno_ritrovamento, famiglia_id) VALUES (?, ?, ?, ?)',
+                         [species_name, discoverer, year, family_id])
         self.last_inserted_species_id = self.get_last_inserted_id()
 
     def get_last_inserted_id(self) -> int:
@@ -165,9 +174,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--filename", help="Filename path", default=FILENAME, type=str, dest="filename")
     parser.add_argument("-a", "--address", help="MariaDB (MySQL) server address", default=HOST, type=str, dest="host")
-    parser.add_argument("-P", "--port", help="MariaDB (MySQL) server port number", default=PORT, type=int, dest="port")  # Notice that this flag is uppercase
-    parser.add_argument("-u", "--username", help="MariaDB (MySQL) username", default=USERNAME, type=str, dest="username")
-    parser.add_argument("-p", "--password", help="MariaDB (MySQL) password", default=PASSWORD, type=str, dest="password")
-    parser.add_argument("-d", "--database", help="MariaDB (MySQL) database to be used", default=DATABASE, type=str, dest="database")
+    parser.add_argument("-P", "--port", help="MariaDB (MySQL) server port number", default=PORT, type=int,
+                        dest="port")  # Notice that this flag is uppercase
+    parser.add_argument("-u", "--username", help="MariaDB (MySQL) username", default=USERNAME, type=str,
+                        dest="username")
+    parser.add_argument("-p", "--password", help="MariaDB (MySQL) password", default=PASSWORD, type=str,
+                        dest="password")
+    parser.add_argument("-d", "--database", help="MariaDB (MySQL) database to be used", default=DATABASE, type=str,
+                        dest="database")
+    parser.add_argument("--add", help="Add records to the database", default=False,
+                        action=argparse.BooleanOptionalAction)  # Enable this flag to append data to existing
+    # families. If the family doesn't exist, the script will create it automatically
     args = parser.parse_args()
     main(args.filename, args.host, args.port, args.username, args.password, args.database)
