@@ -23,7 +23,7 @@ class DataType(Enum):
     CLASS = 1
     FAMILY = 2
     SPECIES = 3
-    EXAMPLE = 4
+    SPECIMEN = 4
 
 
 class Parser:
@@ -51,7 +51,7 @@ class Parser:
         Regex based line parsers
         :param line: line to be parsed
         :return: parsed line; namely a list of all the different elements, according to the
-        type ofline (class,family, species or example)
+        type of line (class, family, species or specimen)
         """
         logging.info(f"Parsing {line}")
         if not line or line == "\n":
@@ -65,11 +65,11 @@ class Parser:
             self.current_family_code = next(self.gen)
             return DataType.FAMILY, [self.current_family, self.current_family_code]
         else:
-            parsed_example: Sequence[str] = re.match(r"^([ a-z\.]+)[ \(]*([\w \.&'\-,]+), ?(\d+)[\) ]*",
+            parsed_species: Sequence[str] = re.match(r"^([ a-z\.]+)[ \(]*([\w \.&'\-,]+), ?(\d+)[\) ]*",
                                                      parsed_line[1].strip()).groups()
-            return DataType.SPECIES, [parsed_line[0] + " " + parsed_example[0],  # Name
-                                      parsed_example[1],  # Discoverer
-                                      parsed_example[2]]  # Year
+            return DataType.SPECIES, [parsed_line[0] + " " + parsed_species[0],  # Name
+                                      parsed_species[1],  # Discoverer
+                                      parsed_species[2]]  # Year
 
 
 class DBConnector:
