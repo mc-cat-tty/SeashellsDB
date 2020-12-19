@@ -12,7 +12,7 @@ from typing import List, Optional
 
 LOGGING_FILENAME: str = "database_interface.log"
 
-logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(levelname)s: %(message)s", filename=LOGGING_FILENAME)
+logging.basicConfig(level=logging.DEBUG, filemode="a", format="%(asctime)s - %(levelname)s: %(message)s", filename=LOGGING_FILENAME)
 
 
 class DBInterface:
@@ -75,15 +75,16 @@ class DBInterface:
         self.cur.execute('INSERT INTO specie (nome, ritrovatore, anno_ritrovamento, famiglia_id) VALUES (?, ?, ?, ?)',
                          [species_name, discoverer, year, family_id])
 
-    def insert_specimen(self, date: mariadb.Date, place: str, state: str, species_id: int, conditions: Optional[str] = "@null",
-                        notes: Optional[str] = "@null", picture_name: Optional[str] = "@null") -> None:
-        # logging.debug(f'INSERT INTO esemplare (data_ritrovamento, luogo_ritrovamento, stato_ritrovamento, specie_id, '
-        #               f'condizioni_ritrovamento, note, foto) VALUES ({str(date)}, {place}, {state}, {species_id}, '
-        #               f'{conditions}, {notes}, {picture_name})')
+    def insert_specimen(self, date: mariadb.Date, place: str, state: str, species_id: int,
+                        conditions: Optional[str] = None, notes: Optional[str] = None,
+                        picture_name: Optional[str] = None) -> None:
+        logging.debug(f'INSERT INTO esemplare (data_ritrovamento, luogo_ritrovamento, stato_ritrovamento, specie_id, '
+                      f'condizioni_ritrovamento, note, foto) VALUES ({str(date)}, {place}, {state}, {species_id}, '
+                      f'{conditions}, {notes}, {picture_name})')
         self.cur.execute('INSERT INTO esemplare (data_ritrovamento, luogo_ritrovamento, stato_ritrovamento, specie_id, '
                          'condizioni_ritrovamento, note, foto) VALUES (?, ?, ?, ?, ?, ?, ?)',
                          [str(date), place, state, species_id, conditions, notes,
-                          picture_name if picture_name == "@null" else self.to_binary_data(picture_name)])
+                          picture_name if picture_name is None else self.to_binary_data(picture_name)])
 
     def get_class_id(self, class_name: str) -> int:
         logging.debug(f'SELECT id FROM genere WHERE nome = {class_name}')
