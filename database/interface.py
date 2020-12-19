@@ -75,14 +75,15 @@ class DBInterface:
         self.cur.execute('INSERT INTO specie (nome, ritrovatore, anno_ritrovamento, famiglia_id) VALUES (?, ?, ?, ?)',
                          [species_name, discoverer, year, family_id])
 
-    def insert_specimen(self, date: mariadb.Date, place: str, state: str, species_id: int, conditions: Optional[str],
-                        notes: Optional[str], picture_name: str) -> None:
-        logging.debug(f'INSERT INTO esemplare (data_ritrovamento, luogo_ritrovamento, stato_ritrovamento, specie_id, '
-                      f'condizioni_ritrovamento, note, foto) VALUES ({str(date)}, {place}, {state}, {species_id}, '
-                      f'{conditions}, {notes}, {picture_name})')
+    def insert_specimen(self, date: mariadb.Date, place: str, state: str, species_id: int, conditions: Optional[str] = "@null",
+                        notes: Optional[str] = "@null", picture_name: Optional[str] = "@null") -> None:
+        # logging.debug(f'INSERT INTO esemplare (data_ritrovamento, luogo_ritrovamento, stato_ritrovamento, specie_id, '
+        #               f'condizioni_ritrovamento, note, foto) VALUES ({str(date)}, {place}, {state}, {species_id}, '
+        #               f'{conditions}, {notes}, {picture_name})')
         self.cur.execute('INSERT INTO esemplare (data_ritrovamento, luogo_ritrovamento, stato_ritrovamento, specie_id, '
                          'condizioni_ritrovamento, note, foto) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                         [str(date), place, state, species_id, conditions, notes, self.to_binary_data(picture_name)])
+                         [str(date), place, state, species_id, conditions, notes,
+                          picture_name if picture_name == "@null" else self.to_binary_data(picture_name)])
 
     def get_class_id(self, class_name: str) -> int:
         logging.debug(f'SELECT id FROM genere WHERE nome = {class_name}')
@@ -98,3 +99,24 @@ class DBInterface:
         logging.debug(f'SELECT id FROM specie WHERE nome = {species_name}')
         self.cur.execute('SELECT id FROM specie WHERE nome = ?', species_name)
         return self.cur.fetchone()[0]
+
+    def search_class(self, partial_class_name: str,
+                     variable_begin: Optional[bool] = False, variable_end: Optional[bool] = True):
+        logging.debug(f'SELECT * FROM genere WHERE nome LIKE '
+                      f'{"%" if variable_begin else ""}{partial_class_name}{"%" if variable_end else ""}')
+        self.cur.execute('SELECT * FROM genere WHERE nome LIKE ?',
+                         f'{"%" if variable_begin else ""}{partial_class_name}{"%" if variable_end else ""}')
+
+    def search_family(self, partial_family_name: str,
+                      variable_begin: Optional[bool] = False, variable_end: Optional[bool] = True):
+        logging.debug(f'SELECT * FROM famiglia WHERE nome LIKE '
+                      f'{"%" if variable_begin else ""}{partial_family_name}{"%" if variable_end else ""}')
+        self.cur.execute('SELECT * FROM famiglia WHERE nome LIKE ?',
+                         f'{"%" if variable_begin else ""}{partial_family_name}{"%" if variable_end else ""}')
+
+    def search_family(self, partial_species_name: str,
+                      variable_begin: Optional[bool] = False, variable_end: Optional[bool] = True):
+        logging.debug(f'SELECT * FROM specie WHERE nome LIKE '
+                      f'{"%" if variable_begin else ""}{partial_species_name}{"%" if variable_end else ""}')
+        self.cur.execute('SELECT * FROM specie WHERE nome LIKE ?',
+                         f'{"%" if variable_begin else ""}{partial_species_name}{"%" if variable_end else ""}')
