@@ -17,6 +17,15 @@ logging.basicConfig(level=logging.DEBUG, filemode="a", format="%(asctime)s - %(l
                     filename=LOGGING_FILENAME)
 
 
+class QueryFailed(ValueError):
+    """
+    Exception raised when a select condition did not match any record, so the query "failed"
+    """
+
+    def __str__(self):
+        return "No results match your search criteria"
+
+
 class Table(Enum):
     CLASS = auto(),
     FAMILY = auto(),
@@ -103,30 +112,63 @@ class DBInterface:
     def get_class_id(self, class_name: str) -> int:
         logging.debug(f'SELECT id FROM genere WHERE nome = {class_name}')
         self.cur.execute('SELECT id FROM genere WHERE nome = ?', [class_name])
-        return int(self.cur.fetchone()[0])
+        try:
+            result: int = self.cur.fetchone()[0]
+        except TypeError:  # Empty results list
+            e: QueryFailed = QueryFailed()
+            logging.error(e)
+            raise e
+        else:
+            return result
 
     def get_family_id(self, family_name: str) -> int:
         logging.debug(f'SELECT id FROM famiglia WHERE nome = {family_name}')
         self.cur.execute('SELECT id FROM famiglia WHERE nome = ?', [family_name])
-        return int(self.cur.fetchone()[0])
+        try:
+            result: int = self.cur.fetchone()[0]
+        except TypeError:  # Empty results list
+            e: QueryFailed = QueryFailed()
+            logging.error(e)
+            raise e
+        else:
+            return result
 
     def get_species_id(self, species_name: str) -> int:
         logging.debug(f'SELECT id FROM specie WHERE nome = {species_name}')
         self.cur.execute('SELECT id FROM specie WHERE nome = ?', [species_name])
-        return int(self.cur.fetchone()[0])
+        try:
+            result: int = self.cur.fetchone()[0]
+        except TypeError:  # Empty results list
+            e: QueryFailed = QueryFailed()
+            logging.error(e)
+            raise e
+        else:
+            return result
 
     def get_everything_from(self, table: Table, search_field_equals_to: str, search_field: str = "nome") -> Tuple:
         logging.debug(f'SELECT * FROM {str(table)} WHERE {search_field} = {search_field_equals_to}')
         self.cur.execute(f'SELECT * FROM {str(table)} WHERE {search_field} = ?', [search_field_equals_to])
-        return self.cur.fetchone()
-        
+        result: Tuple = self.cur.fetchone()
+        if result is not None:
+            return result
+        else:
+            e: QueryFailed = QueryFailed()
+            logging.error(e)
+            raise e
+
     def search_class(self, partial_class_name: str,
                      variable_begin: Optional[bool] = False, variable_end: Optional[bool] = True) -> List[Tuple]:
         logging.debug(f'SELECT * FROM genere WHERE nome LIKE '
                       f'{"%" if variable_begin else ""}{partial_class_name}{"%" if variable_end else ""}')
         self.cur.execute('SELECT * FROM genere WHERE nome LIKE ?',
                          [f'{"%" if variable_begin else ""}{partial_class_name}{"%" if variable_end else ""}'])
-        return [row for row in self.cur]
+        results: List[Tuple] = [row for row in self.cur]
+        if results:
+            return results
+        else:
+            e: QueryFailed = QueryFailed()
+            logging.error(e)
+            raise e
 
     def search_family(self, partial_family_name: str,
                       variable_begin: Optional[bool] = False, variable_end: Optional[bool] = True) -> List[Tuple]:
@@ -134,7 +176,13 @@ class DBInterface:
                       f'{"%" if variable_begin else ""}{partial_family_name}{"%" if variable_end else ""}')
         self.cur.execute('SELECT * FROM famiglia WHERE nome LIKE ?',
                          [f'{"%" if variable_begin else ""}{partial_family_name}{"%" if variable_end else ""}'])
-        return [row for row in self.cur]
+        results: List[Tuple] = [row for row in self.cur]
+        if results:
+            return results
+        else:
+            e: QueryFailed = QueryFailed()
+            logging.error(e)
+            raise e
 
     def search_species(self, partial_species_name: str,
                        variable_begin: Optional[bool] = False, variable_end: Optional[bool] = True) -> List[Tuple]:
@@ -142,5 +190,11 @@ class DBInterface:
                       f'{"%" if variable_begin else ""}{partial_species_name}{"%" if variable_end else ""}')
         self.cur.execute('SELECT * FROM specie WHERE nome LIKE ?',
                          [f'{"%" if variable_begin else ""}{partial_species_name}{"%" if variable_end else ""}'])
-        return [row for row in self.cur]
+        results: List[Tuple] = [row for row in self.cur]
+        if results:
+            return results
+        else:
+            e: QueryFailed = QueryFailed()
+            logging.error(e)
+            raise e
 
