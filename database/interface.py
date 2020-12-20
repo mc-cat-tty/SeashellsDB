@@ -8,11 +8,24 @@ __author__ = "Francesco Mecatti"
 
 import logging
 import mariadb
-from typing import List, Optional
+from enum import Enum, auto
+from typing import List, Optional, Tuple
 
 LOGGING_FILENAME: str = "database_interface.log"
 
-logging.basicConfig(level=logging.DEBUG, filemode="a", format="%(asctime)s - %(levelname)s: %(message)s", filename=LOGGING_FILENAME)
+logging.basicConfig(level=logging.DEBUG, filemode="a", format="%(asctime)s - %(levelname)s: %(message)s",
+                    filename=LOGGING_FILENAME)
+
+
+class Table(Enum):
+    CLASS = auto(),
+    FAMILY = auto(),
+    SPECIES = auto(),
+    SPECIMEN = auto()
+
+    def __str__(self) -> str:
+        self.lookup_dict = {self.CLASS: "genere", self.FAMILY: "famiglia", self.SPECIES: "specie", self.SPECIMEN: "esemplare"}
+        return self.lookup_dict[self]
 
 
 class DBInterface:
@@ -20,7 +33,7 @@ class DBInterface:
         try:
             logging.debug(
                 f"Connecting to the server\n\thost: {host}\t\tport: {port}\n"
-                f"\tusername: {username}\tpassword: {password}\n\tdatabase: {database}")
+                f"\tusername: {username}\tpassword: *******\n\tdatabase: {database}")
             self.conn = mariadb.connect(
                 user=username,
                 password=password,
@@ -39,23 +52,24 @@ class DBInterface:
     def __del__(self) -> None:
         self.conn.close()
 
-    def to_binary_data(self, filename: str):
+    @staticmethod
+    def to_binary_data(filename: str) -> bytes:
         with open(filename, "rb") as file:
             return file.read()
 
-    def list_classes(self) -> List[str]:
+    def list_classes(self) -> List[Tuple]:
         self.cur.execute("SELECT * FROM genere")
         return [c for c in self.cur]
 
-    def list_families(self) -> List[str]:
+    def list_families(self) -> List[Tuple]:
         self.cur.execute("SELECT * FROM famiglia")
         return [f for f in self.cur]
 
-    def list_species(self) -> List[str]:
+    def list_species(self) -> List[Tuple]:
         self.cur.execute("SELECT * FROM specie")
         return [s for s in self.cur]
 
-    def list_specimens(self) -> List[str]:
+    def list_specimens(self) -> List[Tuple]:
         self.cur.execute("SELECT * FROM esemplare")
         return [s for s in self.cur]
 
@@ -88,36 +102,45 @@ class DBInterface:
 
     def get_class_id(self, class_name: str) -> int:
         logging.debug(f'SELECT id FROM genere WHERE nome = {class_name}')
-        self.cur.execute('SELECT id FROM genere WHERE nome = ?', class_name)
-        return self.cur.fetchone()[0]
+        self.cur.execute('SELECT id FROM genere WHERE nome = ?', [class_name])
+        return int(self.cur.fetchone()[0])
 
     def get_family_id(self, family_name: str) -> int:
         logging.debug(f'SELECT id FROM famiglia WHERE nome = {family_name}')
-        self.cur.execute('SELECT id FROM famiglia WHERE nome = ?', family_name)
-        return self.cur.fetchone()[0]
+        self.cur.execute('SELECT id FROM famiglia WHERE nome = ?', [family_name])
+        return int(self.cur.fetchone()[0])
 
     def get_species_id(self, species_name: str) -> int:
         logging.debug(f'SELECT id FROM specie WHERE nome = {species_name}')
-        self.cur.execute('SELECT id FROM specie WHERE nome = ?', species_name)
-        return self.cur.fetchone()[0]
+        self.cur.execute('SELECT id FROM specie WHERE nome = ?', [species_name])
+        return int(self.cur.fetchone()[0])
 
+    def get_everything_from(self, table: Table, search_field_equals_to: str, search_field: str = "nome") -> Tuple:
+        logging.debug(f'SELECT * FROM {str(table)} WHERE {search_field} = {search_field_equals_to}')
+        self.cur.execute(f'SELECT * FROM {str(table)} WHERE {search_field} = ?', [search_field_equals_to])
+        return self.cur.fetchone()
+        
     def search_class(self, partial_class_name: str,
-                     variable_begin: Optional[bool] = False, variable_end: Optional[bool] = True):
+                     variable_begin: Optional[bool] = False, variable_end: Optional[bool] = True) -> List[Tuple]:
         logging.debug(f'SELECT * FROM genere WHERE nome LIKE '
                       f'{"%" if variable_begin else ""}{partial_class_name}{"%" if variable_end else ""}')
         self.cur.execute('SELECT * FROM genere WHERE nome LIKE ?',
-                         f'{"%" if variable_begin else ""}{partial_class_name}{"%" if variable_end else ""}')
+                         [f'{"%" if variable_begin else ""}{partial_class_name}{"%" if variable_end else ""}'])
+        return [row for row in self.cur]
 
     def search_family(self, partial_family_name: str,
-                      variable_begin: Optional[bool] = False, variable_end: Optional[bool] = True):
+                      variable_begin: Optional[bool] = False, variable_end: Optional[bool] = True) -> List[Tuple]:
         logging.debug(f'SELECT * FROM famiglia WHERE nome LIKE '
                       f'{"%" if variable_begin else ""}{partial_family_name}{"%" if variable_end else ""}')
         self.cur.execute('SELECT * FROM famiglia WHERE nome LIKE ?',
-                         f'{"%" if variable_begin else ""}{partial_family_name}{"%" if variable_end else ""}')
+                         [f'{"%" if variable_begin else ""}{partial_family_name}{"%" if variable_end else ""}'])
+        return [row for row in self.cur]
 
-    def search_family(self, partial_species_name: str,
-                      variable_begin: Optional[bool] = False, variable_end: Optional[bool] = True):
+    def search_species(self, partial_species_name: str,
+                       variable_begin: Optional[bool] = False, variable_end: Optional[bool] = True) -> List[Tuple]:
         logging.debug(f'SELECT * FROM specie WHERE nome LIKE '
                       f'{"%" if variable_begin else ""}{partial_species_name}{"%" if variable_end else ""}')
         self.cur.execute('SELECT * FROM specie WHERE nome LIKE ?',
-                         f'{"%" if variable_begin else ""}{partial_species_name}{"%" if variable_end else ""}')
+                         [f'{"%" if variable_begin else ""}{partial_species_name}{"%" if variable_end else ""}'])
+        return [row for row in self.cur]
+

@@ -41,3 +41,4 @@ And now globally (virtual environment deactivated):
 ```
 python3 -m notebook
 ```
+From web interface change Kernel from _Kernel_ > _Change Kernel_

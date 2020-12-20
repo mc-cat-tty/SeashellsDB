@@ -80,7 +80,7 @@ class DBConnector:
             self.last_inserted_species_id = None
             logging.debug(
                 f"Connecting to the server\n\thost: {host}\t\tport: {port}\n"
-                f"\tusername: {username}\tpassword: {password}\n\tdatabase: {database}")
+                f"\tusername: {username}\tpassword: *******\n\tdatabase: {database}")
             self.conn = mariadb.connect(
                 user=username,
                 password=password,
