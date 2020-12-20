@@ -26,7 +26,7 @@ Change the others parameters if needed
 
 ### Add raw data
 ```
-python3 importer.py -f _filename_ -p _password_ --add
+python3 importer.py -f <pre>filename</pre> -p _password_ --add
 ```
 
 ### Local Jupyter set up 
