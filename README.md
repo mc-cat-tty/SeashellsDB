@@ -25,9 +25,9 @@ Keep in mind that you have to set your own password through `-p` argument, other
 Change the others parameters if needed
 
 ### Add raw data
-<pre>
-python3 importer.py -f _filename_ -p _password_ --add
-</pre>
+```
+python3 importer.py -f <b>filename</b> -p <b>password</b> --add
+```
 
 ### Local Jupyter set up 
 Extremely handy during code prototyping (eg.: test SQL queries through mariadb connectors, clean raw data, ...)
