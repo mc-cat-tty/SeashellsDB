@@ -1,7 +1,7 @@
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 import Home from './pages/Home'
-import VisualizeData from './pages/VisualizeData'
+import ViewData from './pages/ViewData'
 import ManageData from './pages/ManageData'
 
 const TitledRoute = props => {
@@ -16,7 +16,7 @@ const Main = () => {
     return (
         <Switch>
             <TitledRoute exact path="/" title="Home" component={Home}/>
-            <TitledRoute exact path="/visualize" title="Visualize data" component={VisualizeData}/>
+            <TitledRoute exact path="/view" title="View data" component={ViewData}/>
             <TitledRoute exact path="/manage" title="Manage data" component={ManageData}/>
         </Switch>
     );

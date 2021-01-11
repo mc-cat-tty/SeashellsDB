@@ -16,7 +16,7 @@ import logo from './logo.png'
 //     <nav>
 //       <ul>
 //         <li><NavLink exact activeClassName="current" to="/">Home</NavLink></li>
-//         <li><NavLink exact activeClassName="current" to="/visualize">Visualize</NavLink></li>
+//         <li><NavLink exact activeClassName="current" to="/view">View</NavLink></li>
 //         <li><NavLink exact activeClassName="current" to="/manage">Manage</NavLink></li>
 //       </ul>
 //     </nav>
@@ -38,7 +38,7 @@ const App = withRouter(({ location: { pathname } }) => (
             <Card style={{padding:"2px"}} className="shadow">
                 <AtlassianNavigation label="navigator" renderProductHome={ NavHome } primaryItems={[
                     <PrimaryButton isHighlighted={pathname === "/manage"}> <NavLink exact activeClassName="current" to="/manage"> Manage </NavLink> </PrimaryButton>,
-                    <PrimaryButton isHighlighted={pathname === "/visualize"}> <NavLink exact activeClassName="current" to="/visualize"> Visualize </NavLink> </PrimaryButton>,
+                    <PrimaryButton isHighlighted={pathname === "/view"}> <NavLink exact activeClassName="current" to="/view"> View </NavLink> </PrimaryButton>,
                 ]}/>
                 <Main />
                 <Card.Footer className="text-muted text-center" style={{marginTop:"20px", marginBottom: "-2px", marginRight: "-2px", marginLeft: "-2px", backgroundColor: "#DEEBFF"}}>
