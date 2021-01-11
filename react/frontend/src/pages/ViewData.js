@@ -1,25 +1,37 @@
 import React from 'react';
-import {NavLink, Route, Switch} from 'react-router-dom';
+import {useHistory, Route, Switch} from 'react-router-dom';
 import Table from './ViewDataStructures/Table';
 import TableTree from './ViewDataStructures/TableTree';
 import Tree from './ViewDataStructures/Tree';
-import Nav from 'react-bootstrap/Nav'
+import Nav from 'react-bootstrap/Nav';
 
-import './ViewData.css'
+import './ViewData.css';
 
-const SwitchView = () => (  // TODO: Current selected doesn't update, router and not href
-    <Nav variant="pills" className="justify-content-center" defaultActiveKey="/view/table" style={{padding: "20px"}}>
+const SwitchView = () => {
+    const [ActiveView, setActiveView] = React.useState('/view/table');
+        const history = useHistory();
+    const handleSelect = selected => {
+        history.push(selected);
+        setActiveView(selected);
+    }
+
+    const SwitchNavLink = ({children, link}) => (
+            <Nav.Link className="navlink" eventKey={link}>{children}</Nav.Link>
+    );
+
+    return (  // TODO: Current selected doesn't update, router and not href
+    <Nav variant="pills" className="justify-content-center" defaultActiveKey={ActiveView} style={{padding: "20px"}} onSelect={handleSelect}>
         <Nav.Item>
-            <Nav.Link className="navlink" href="/view/table">Table</Nav.Link>
+            <SwitchNavLink link="/view/table">Table</SwitchNavLink>
         </Nav.Item>
         <Nav.Item>
-            <Nav.Link className="navlink" href="/view/tabletree" eventKey="link-1">Table Tree</Nav.Link>
+            <SwitchNavLink link="/view/tabletree">Table Tree</SwitchNavLink>
         </Nav.Item>
         <Nav.Item>
-            <Nav.Link className="navlink" href="/view/tree" eventKey="link-2">Tree</Nav.Link>
+            <SwitchNavLink link="/view/tree">Tree</SwitchNavLink>
         </Nav.Item>
     </Nav>
-)
+)};
 
 const View = () => (
     <Switch>
@@ -27,7 +39,7 @@ const View = () => (
         <Route exact path="/view/tabletree" component={TableTree}/>
         <Route exact path="/view/tree" component={Tree}/>
     </Switch>
-)
+);
 
 const ViewData = () => (
     <div className="visualizedata">

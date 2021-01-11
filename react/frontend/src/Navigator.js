@@ -8,14 +8,14 @@ import logo from "./logo.png";
 //     <nav>
 //       <ul>
 //         <li><NavLink exact activeClassName="current" to="/">Home</NavLink></li>
-//         <li><NavLink exact activeClassName="current" to="/view">View</NavLink></li>
+//         <li><NavLink exact activeClassName="current" to="/view/table">View</NavLink></li>
 //         <li><NavLink exact activeClassName="current" to="/manage">Manage</NavLink></li>
 //       </ul>
 //     </nav>
 // );
 
 const NavHome = () => (
-    <NavLink exact to="/" tabindex="-1" style={{ outline: 0 }}>
+    <NavLink exact to="/" tabIndex="-1" style={{ outline: 0 }}>
     <CustomProductHome
     logoAlt="Home"
     logoUrl={logo}
@@ -46,8 +46,8 @@ const NavProfile = () => {
 
 const Navigator = ({pathname}) => (
     <AtlassianNavigation label="navigator" renderProductHome={ NavHome } primaryItems={[
-        <NavLink exact activeClassName="current"  tabindex="-1" style={{ textDecoration: 'none', outline: 0 }} to="/manage"><PrimaryButton isHighlighted={pathname === "/manage"}> Manage </PrimaryButton></NavLink>,
-        <NavLink exact activeClassName="current"  tabindex="-1" style={{ textDecoration: 'none', outline: 0 }} to="/view"><PrimaryButton isHighlighted={pathname === "/view"}> View </PrimaryButton></NavLink>,
+        <NavLink exact activeClassName="current"  tabIndex="-1" style={{ textDecoration: 'none', outline: 0 }} to="/manage"><PrimaryButton isHighlighted={pathname === "/manage"}> Manage </PrimaryButton></NavLink>,
+        <NavLink exact activeClassName="current"  tabIndex="-1" style={{ textDecoration: 'none', outline: 0 }} to="/view/table"><PrimaryButton isHighlighted={pathname.startsWith("/view")}> View </PrimaryButton></NavLink>,
     ]} renderProfile={ NavProfile }
     />
 );
