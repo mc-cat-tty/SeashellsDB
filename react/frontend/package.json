@@ -6,6 +6,7 @@
     "@atlaskit/atlassian-navigation": "^0.12.5",
     "@atlaskit/avatar": "^20.1.0",
     "@atlaskit/css-reset": "^6.0.5",
+    "@atlaskit/dynamic-table": "^14.1.5",
     "@testing-library/jest-dom": "^5.11.8",
     "@testing-library/react": "^11.2.3",
     "@testing-library/user-event": "^12.6.0",

@@ -19,7 +19,7 @@ const SwitchView = () => {
             <Nav.Link className="navlink" eventKey={link}>{children}</Nav.Link>
     );
 
-    return (  // TODO: Current selected doesn't update, router and not href
+    return (
     <Nav variant="pills" className="justify-content-center" defaultActiveKey={ActiveView} style={{padding: "20px"}} onSelect={handleSelect}>
         <Nav.Item>
             <SwitchNavLink link="/view/table">Table</SwitchNavLink>
