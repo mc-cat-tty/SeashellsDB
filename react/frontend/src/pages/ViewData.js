@@ -1,7 +1,7 @@
 import React from 'react';
 import {useHistory, Route, Switch} from 'react-router-dom';
 import Table from './ViewDataStructures/Table';
-import TableTree from './ViewDataStructures/TableTree';
+import ViewTableTree from './ViewDataStructures/TableTree';
 import Tree from './ViewDataStructures/Tree';
 import Nav from 'react-bootstrap/Nav';
 
@@ -36,7 +36,7 @@ const SwitchView = () => {
 const View = () => (
     <Switch>
         <Route exact path="/view/table" component={Table}/>
-        <Route exact path="/view/tabletree" component={TableTree}/>
+        <Route exact path="/view/tabletree" component={ViewTableTree}/>
         <Route exact path="/view/tree" component={Tree}/>
     </Switch>
 );
