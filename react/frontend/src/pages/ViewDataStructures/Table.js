@@ -1,25 +1,51 @@
 import React from 'react';
 import DynamicTable from '@atlaskit/dynamic-table';
 
+const data = [
+    {key: 'row-1-test',
+        cells: [
+    {
+        key: "aa",
+        content: "test"
+    },
+            {
+                key: 'bb',
+                content: 'test'
+            } ]
+    },
+    {key: 'row-1-test2',
+        cells: [
+    {
+        key: "aa",
+        content: "test2"
+    },
+            {
+                key: 'bb',
+                content: 'test2'
+            } ]
+    }
+]
+
 const Table = () => (
     <div className="table">
         <DynamicTable caption='table'
           head={{cells:[
           {
-              key:'kj',
-              content:'jj',
+              key:'aa',
+              content:'aa',
               isSortable:true,
               width:undefined,
               soundTruncate : false,
           },
               {
-              key:'test',
-              content:'nn',
+              key:'bb',
+              content:'bb',
               isSortable:true,
               width:undefined,
               soundTruncate : false,
           }
               ]}}
+          rows={data}
           defaultPage={1}
           loadingSpinnerSize="large"
           isLoading={false}
