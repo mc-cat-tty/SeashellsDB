@@ -149,7 +149,7 @@ const RootNode = ({node}) => (
 );
 
 const SvgTree = ({width, height, margin = defaultMargin}) => {
-    const data = useMemo(() => hierarchy(rawTree), []);
+    const data = useMemo(() => hierarchy(rawTree), []);  // TODO: fix x & y finding algorithm
     const yMax = height - margin.top - margin.bottom;
     const xMax = width - margin.left - margin.right;
 
