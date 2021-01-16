@@ -26,7 +26,7 @@ const data = [
     }
 ]
 
-const Table = () => (
+const ViewTable = () => (
     <div className="table">
         <DynamicTable caption='table'
           head={{cells:[
@@ -54,4 +54,4 @@ const Table = () => (
     </div>
 );
 
-export default Table;
+export default ViewTable;

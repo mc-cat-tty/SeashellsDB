@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import {useHistory, useLocation, Route, Switch} from 'react-router-dom';
 import Home from './pages/Home';
 import ViewData from './pages/ViewData';
 import ManageData from './pages/ManageData';
@@ -12,7 +12,18 @@ const TitledRoute = props => {
     );
 }
 
+
 const Main = () => {
+    const history = useHistory();
+    React.useEffect(() => {
+        history.push(localStorage.getItem('route') || '/');
+    }, []);
+
+    const location = useLocation();
+    React.useEffect(() => {
+        localStorage.setItem('route', location.pathname);
+    }, [location])
+
     return (
         <Switch>
             <TitledRoute exact path="/" title="Home" component={Home}/>
