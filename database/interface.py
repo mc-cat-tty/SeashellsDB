@@ -66,6 +66,9 @@ class DBInterface:
         with open(filename, "rb") as file:
             return file.read()
 
+    def get_columns(self) -> List[str]:
+        return [column[0] for column in self.cur.description]
+
     def list_classes(self) -> List[Tuple]:
         self.cur.execute("SELECT * FROM genere")
         return [c for c in self.cur]

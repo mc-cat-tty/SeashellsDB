@@ -1,33 +1,41 @@
 from flask import request
 from flask_api import FlaskAPI
 import json
-from typing import Tuple, Dict
+from typing import Tuple, Dict, List
 from database.interface import DBInterface, Table, QueryFailed
 import argparse
 
 app = FlaskAPI(__name__)
 app.config['HOST'] = '0.0.0.0'
+app.config['DEBUG'] = True
+app.config['ENV'] = 'development'
 
 dbi: DBInterface = None
 
-@app.route('/api/get_list', methods=['GET'])
-def get_list():
-    table: str = request.args.get("table")
+@app.route('/api/fetch', methods=['GET'])
+def fetch():
+    table_str: str = request.args.get("table").upper()
+    try:
+        table: Table = Table[table_str]  # Naive security control with mapping function
+    except:
+        return "table arg is invalid", 400
 
-    if table is None:
-        return "Query failed", 400
+    result: List[Tuple] = None
+    if table is Table.CLASS:
+        result = dbi.list_classes()
+    elif table is Table.FAMILY:
+        result = dbi.list_families()
+    elif table is Table.SPECIES:
+        result = dbi.list_species()
+    elif table is Table.SPECIMEN:
+        result = dbi.list_specimens()
 
-    if table == "class":
-        return json.dumps(dbi.list_classes())
-    elif table == "family":
-        return json.dumps(dbi.list_families())
-    elif table == "species":
-        return json.dumps(dbi.list_species())
-    elif table == "specimen":
-        return json.dumps(dbi.list_specimens())
+    return {
+        'content': result,
+        'columns': dbi.get_columns()
+    }
 
-
-@app.route('/api/get_everything_from', methods=['GET'])
+@app.route('/get_everything_from', methods=['GET'])
 def get_everything_from():
     table: str = request.args.get("table").upper()
     search_field: str = request.args.get("search_field")
@@ -46,5 +54,5 @@ if __name__ == '__main__':
     parser: argparse.ArgumentParser = argparse.ArgumentParser()
     parser.add_argument("-p", "--password", help="MariaDB (MySQL) password", type=str, dest="password")
     args = parser.parse_args()
-    dbi: DBInterface = DBInterface("127.0.0.1", 3306, "writeUser", args.password, "conchiglie")
+    dbi = DBInterface("127.0.0.1", 3306, "writeUser", args.password, "conchiglie")
     app.run(host='0.0.0.0', port=5000, debug=True)
