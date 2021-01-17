@@ -37,7 +37,7 @@ const useFetchData = () => {
         {columns: [], content:[], isLoading: false, isError: false}
     );
 
-    const [fetchType, setFetchType] = React.useState('specimen');
+    const [fetchType, setFetchType] = React.useState('class');
 
     const [url, setUrl] = React.useState(
         `${FETCH_API_ENDPOINT}${fetchType}`

@@ -1,5 +1,6 @@
 import React from 'react';
 import DynamicTable from '@atlaskit/dynamic-table';
+import Tabs from '@atlaskit/tabs'
 import useFetchData from '../API/FetchApi';
 import Alert from 'react-bootstrap/Alert'
 
@@ -47,7 +48,7 @@ import Alert from 'react-bootstrap/Alert'
 
 const arrangeData = (data, cols) => data.map(row => (
     {
-        key: `row-${row[1]}`,
+        key: `row-${row[0]}`,
         cells: row.map((value, index) => (
             {
                 key: cols[index],
@@ -68,21 +69,47 @@ const arrangeColumns = cols => cols.map(col => (
     }
 ));
 
+const tabs = [
+    {
+        label: 'class',
+        page: 1
+    },
+    {
+        label: 'family',
+        page: 1
+    },
+    {
+        label: 'species',
+        page: 1
+    },
+    {
+        label: 'specimen',
+        page: 1
+    }
+]
+
 const ViewTable = () => {
     const [fetchData, data] = useFetchData();
     console.log(data.content);
 
     return (
         <div className="table">
+            <Tabs tabs={tabs} onSelect={(selected, selectedIndex) => {
+                fetchData(selected.label);
+            }} />
             {!data.isError ?
                 <DynamicTable
-                          head={{cells:arrangeColumns(data.columns)}}
-                          rows={arrangeData(data.content, data.columns)}
-                          defaultPage={1}
-                          loadingSpinnerSize="large"
-                          isLoading={data.isLoading}
-                          isFixedSize
-                          emptyView={ <Alert key='bootsrap-alert-1' variant='warning'> Empty table </Alert> }
+                    head={{cells:arrangeColumns(data.columns)}}
+                    rows={arrangeData(data.content, data.columns)}
+                    defaultPage={1}
+                    rowsPerPage={10}
+                    page={1}
+                    loadingSpinnerSize="large"
+                    isLoading={data.isLoading}
+                    isFixedSize
+                    emptyView={ <Alert key='bootsrap-alert-1' variant='warning'> Empty table </Alert> }
+                    // defaultSortKey="nome"  // TODO: not working
+                    defaultSortOrder="ASC"
                 />
                 : <Alert key='bootsrap-alert-1' variant='danger'> Server error :\ </Alert>
             }
