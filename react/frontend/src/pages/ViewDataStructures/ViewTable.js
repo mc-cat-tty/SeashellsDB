@@ -94,7 +94,7 @@ const ViewTable = () => {
 
     return (
         <div className="table">
-            <Tabs tabs={tabs} onSelect={(selected, selectedIndex) => {
+            <Tabs tabs={tabs} onSelect={selected => {
                 fetchData(selected.label);
             }} />
             {!data.isError ?
