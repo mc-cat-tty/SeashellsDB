@@ -1,0 +1,57 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@atlaskit/atlassian-navigation": "^0.12.5",
+    "@atlaskit/avatar": "^20.1.0",
+    "@atlaskit/css-reset": "^6.0.5",
+    "@atlaskit/dynamic-table": "^14.1.5",
+    "@atlaskit/table-tree": "^9.0.7",
+    "@testing-library/jest-dom": "^5.11.8",
+    "@testing-library/react": "^11.2.3",
+    "@testing-library/user-event": "^12.6.0",
+    "@visx/gradient": "^1.0.0",
+    "@visx/group": "^1.0.0",
+    "@visx/hierarchy": "^1.0.0",
+    "@visx/shape": "^1.4.0",
+    "axios": "^0.21.1",
+    "bootstrap": "^4.5.3",
+    "echarts": "^5.0.1",
+    "echarts-for-react": "^2.0.16",
+    "react": "^17.0.1",
+    "react-bootstrap": "^1.4.3",
+    "react-dom": "^17.0.1",
+    "react-scripts": "4.0.1",
+    "react-vis": "^1.11.7",
+    "styled-components": "^5.2.1",
+    "web-vitals": "^0.2.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "react-router-dom": "^5.2.0"
+  }
+}
