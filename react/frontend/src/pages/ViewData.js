@@ -1,7 +1,7 @@
 import React from 'react';
 import {useHistory, Route, Switch} from 'react-router-dom';
 import ViewTable from './ViewDataStructures/ViewTable';
-import ViewTableTree from './ViewDataStructures/TableTree';
+import ViewTableTree from './ViewDataStructures/ViewTableTree';
 import ViewTree from './ViewDataStructures/ViewTree';
 import Nav from 'react-bootstrap/Nav';
 

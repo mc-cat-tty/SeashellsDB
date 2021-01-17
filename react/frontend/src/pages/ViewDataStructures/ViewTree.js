@@ -16,7 +16,7 @@ export const background = '#272b4d';
 const defaultMargin = { top: 10, left: 80, right: 80, bottom: 10 };
 
 const rawTree = {
-  name: 'T',
+  name: 'Mollusca',
   children: [
     {
       name: 'A',
@@ -68,33 +68,33 @@ const Node = ({node}) => {
     if (isParent) return <ParentNode node={node} />;
 
     return (
-    <Group top={node.x} left={node.y}>
-      <rect
-        height={height}
-        width={width}
-        y={centerY}
-        x={centerX}
-        fill={background}
-        stroke={green}
-        strokeWidth={1}
-        strokeDasharray="2,2"
-        strokeOpacity={0.6}
-        rx={10}
-        onClick={() => {
-          alert(`clicked: ${JSON.stringify(node.data.name)}`);  // TODO
-        }}
-      />
-      <text
-        dy=".33em"
-        fontSize={9}
-        fontFamily="Arial"
-        textAnchor="middle"
-        fill={green}
-        style={{ pointerEvents: 'none' }}
-      >
-        {node.data.name}
-      </text>
-    </Group>
+        <Group top={node.x} left={node.y}>
+          <rect
+            height={height}
+            width={width}
+            y={centerY}
+            x={centerX}
+            fill={background}
+            stroke={green}
+            strokeWidth={1}
+            strokeDasharray="2,2"
+            strokeOpacity={0.6}
+            rx={10}
+            onClick={() => {
+              alert(`clicked: ${JSON.stringify(node.data.name)}`);  // TODO
+            }}
+          />
+          <text
+            dy=".33em"
+            fontSize={9}
+            fontFamily="Arial"
+            textAnchor="middle"
+            fill={green}
+            style={{ pointerEvents: 'none' }}
+          >
+            {node.data.name}
+          </text>
+        </Group>
     );
 }
 
@@ -134,10 +134,10 @@ const ParentNode = ({node}) => {
 
 const RootNode = ({node}) => (
     <Group top={node.x} left={node.y}>
-      <circle r={12} fill="url('#lg')" />
+      <circle r={30} fill="url('#lg')" />
       <text
         dy=".33em"
-        fontSize={9}
+        fontSize={13}
         fontFamily="Arial"
         textAnchor="middle"
         style={{ pointerEvents: 'none' }}
@@ -148,10 +148,22 @@ const RootNode = ({node}) => (
     </Group>
 );
 
+// const addPositions = (tree, yIndex, yEleNum, yMax) => {
+//     tree.x = 200;
+//     tree.y = (yMax/(yEleNum+1)) * (yIndex+1);
+//     console.log(yIndex, yEleNum, yMax);
+//     if (!!tree.children)
+//         for (let i in tree.children) {
+//             addPositions(tree.children[i], i, tree.children.length, yMax);
+//         }
+//     return tree;
+// };
+
 const SvgTree = ({width, height, margin = defaultMargin}) => {
-    const data = useMemo(() => hierarchy(rawTree), []);  // TODO: fix x & y finding algorithm
+    const data = useMemo(() => hierarchy(rawTree), []);
     const yMax = height - margin.top - margin.bottom;
     const xMax = width - margin.left - margin.right;
+
 
     return width < 10 ? null : (
         <svg width={width} height={height}>
@@ -180,10 +192,33 @@ const SvgTree = ({width, height, margin = defaultMargin}) => {
 }
 
 
-const ViewTree = () => (
-    <div className="tree">
-        <SvgTree width='100%' height='100%' />
-    </div>
-);
+const totalChildren = tree => {
+    if (!tree.children)
+        return 1;
+    let num = 0;
+    for (const node of tree.children) {
+        num += totalChildren(node);
+    }
+    return num;
+}
+
+const ViewTree = () => {
+    const parentRef = React.useRef();
+    console.log(totalChildren(rawTree));
+    const parentHeight = totalChildren(rawTree, 0)*50;
+    const [parentWidth, setParentWidth] = React.useState(100);
+
+    React.useEffect(() => {
+        if (parentRef.current) {
+            setParentWidth(parentRef.current.offsetWidth);
+        }
+    }, [parentRef]);
+
+    return(
+        <div className="tree" ref={parentRef}>
+            <SvgTree width={parentWidth} height={parentHeight}/>
+        </div>
+    );
+}
 
 export default ViewTree;
