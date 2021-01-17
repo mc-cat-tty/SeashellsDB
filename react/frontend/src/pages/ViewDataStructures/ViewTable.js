@@ -1,31 +1,72 @@
 import React from 'react';
 import DynamicTable from '@atlaskit/dynamic-table';
 import useFetchData from '../API/FetchApi';
+import Alert from 'react-bootstrap/Alert'
 
-const data = [
-    {key: 'row-1-test',
-        cells: [
+// const testData = [
+//     {key: 'row-1-test',
+//         cells: [
+//     {
+//         key: "aa",
+//         content: "test"
+//     },
+//             {
+//                 key: 'bb',
+//                 content: 'test'
+//             } ]
+//     },
+//     {key: 'row-1-test2',
+//         cells: [
+//     {
+//         key: "aa",
+//         content: "test2"
+//     },
+//             {
+//                 key: 'bb',
+//                 content: 'test2'
+//             } ]
+//     }
+// ]
+
+// const testCells = [
+//                   {
+//                       key:'aa',
+//                       content:'aa',
+//                       isSortable:true,
+//                       width:undefined,
+//                       soundTruncate : false,
+//                   },
+//                   {
+//                       key:'bb',
+//                       content:'bb',
+//                       isSortable:true,
+//                       width:undefined,
+//                       shouldTruncate: false,
+//                   }
+//               ]
+
+const arrangeData = (data, cols) => data.map(row => (
     {
-        key: "aa",
-        content: "test"
-    },
+        key: `row-${row[1]}`,
+        cells: row.map((value, index) => (
             {
-                key: 'bb',
-                content: 'test'
-            } ]
-    },
-    {key: 'row-1-test2',
-        cells: [
-    {
-        key: "aa",
-        content: "test2"
-    },
-            {
-                key: 'bb',
-                content: 'test2'
-            } ]
+                key: cols[index],
+                content: value
+            }
+        ))
     }
-]
+));
+
+
+const arrangeColumns = cols => cols.map(col => (
+    {
+        key: col,
+        content: col,
+        isSortable: true,
+        width: undefined,
+        shouldTruncate: false
+    }
+));
 
 const ViewTable = () => {
     const [fetchData, data] = useFetchData();
@@ -33,29 +74,18 @@ const ViewTable = () => {
 
     return (
         <div className="table">
-            <DynamicTable caption='table'
-                          head={{cells:[
-                                  {
-                                      key:'aa',
-                                      content:'aa',
-                                      isSortable:true,
-                                      width:undefined,
-                                      soundTruncate : false,
-                                  },
-                                  {
-                                      key:'bb',
-                                      content:'bb',
-                                      isSortable:true,
-                                      width:undefined,
-                                      soundTruncate : false,
-                                  }
-                              ]}}
-                          rows={data}
+            {!data.isError ?
+                <DynamicTable
+                          head={{cells:arrangeColumns(data.columns)}}
+                          rows={arrangeData(data.content, data.columns)}
                           defaultPage={1}
                           loadingSpinnerSize="large"
-                          isLoading={false}
+                          isLoading={data.isLoading}
                           isFixedSize
-            />
+                          emptyView={ <Alert key='bootsrap-alert-1' variant='warning'> Empty table </Alert> }
+                />
+                : <Alert key='bootsrap-alert-1' variant='danger'> Server error :\ </Alert>
+            }
         </div>
     );
 }
