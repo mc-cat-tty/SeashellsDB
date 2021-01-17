@@ -82,7 +82,7 @@ class DBInterface:
         return [s for s in self.cur]
 
     def list_specimens(self) -> List[Tuple]:
-        self.cur.execute("SELECT * FROM esemplare")
+        self.cur.execute("SELECT id, data_ritrovamento, luogo_ritrovamento, stato_ritrovamento, condizioni_ritrovamento, specie_id FROM esemplare")
         return [s for s in self.cur]
 
     def insert_class(self, class_name: str) -> None:
