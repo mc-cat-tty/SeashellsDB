@@ -1,8 +1,9 @@
 import React from 'react';
 import axios from 'axios';
 
-const URL = window.origin;
-const FETCH_API_ENDPOINT = `${URL}/api/fetch?type=`;
+// const URL = window.origin;
+const URL = 'http://localhost:5000'
+const FETCH_API_ENDPOINT = `${URL}/api/fetch?table=`;
 
 const dataReducer = (state, action) => {
     switch (action.type) {
@@ -17,7 +18,8 @@ const dataReducer = (state, action) => {
                 ...state,
                 isLoading: false,
                 isError: false,
-                content: action.payload
+                content: action.payload.content,
+                columns: action.payload.columns,
             };
         case 'DATA_FETCH_ERROR':
             return {
@@ -32,10 +34,10 @@ const dataReducer = (state, action) => {
 const useFetchData = () => {
     const [data, dispatchData] = React.useReducer(
         dataReducer,
-        {content:[], isLoading: false, isError: false}
+        {columns: [], content:[], isLoading: false, isError: false}
     );
 
-    const [fetchType, setFetchType] = React.useState('class');
+    const [fetchType, setFetchType] = React.useState('specimen');
 
     const [url, setUrl] = React.useState(
         `${FETCH_API_ENDPOINT}${fetchType}`
