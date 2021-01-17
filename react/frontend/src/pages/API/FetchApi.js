@@ -27,6 +27,8 @@ const dataReducer = (state, action) => {
                 isLoading: false,
                 isError: true
             };
+        default:
+            throw new Error();
     }
 }
 

@@ -90,7 +90,6 @@ const tabs = [
 
 const ViewTable = () => {
     const [fetchData, data] = useFetchData();
-    console.log(data.content);
 
     return (
         <div className="table">
