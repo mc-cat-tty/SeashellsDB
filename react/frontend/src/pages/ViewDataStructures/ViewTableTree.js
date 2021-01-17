@@ -1,6 +1,8 @@
 import React from 'react';
 import TableTree, {Rows, Row, Cell} from '@atlaskit/table-tree';
+import Spinner from '@atlaskit/spinner'
 import useFetchData from '../API/FetchApi';
+import Alert from "react-bootstrap/Alert";
 
 // const data = {
 //   "children": [
@@ -178,7 +180,9 @@ const ViewTableTree = () => {
             columns={headers}
             columnWidths={['700px', '700px', '700px']}
         >
-            <Rows
+            {data.isLoading && <div style={{position: 'relative', left: '45%', top: '5px'}}> <Spinner size='large' /> </div>}
+            {!data.isLoading &&
+                <Rows
                 items={arrangeData(type, data.content, data.columns)}
                 render={({name, id, type, children}) => (
                     <Row
@@ -191,8 +195,9 @@ const ViewTableTree = () => {
                         <Cell singleLine>{id}</Cell>
                         <Cell singleLine>{type}</Cell>
                     </Row>
-                )}
-            />
+                )}/>
+            }
+            {data.isError && <Alert key='bootsrap-alert-1' variant='danger'> Server error :\ </Alert>}
         </TableTree>
     </div>
   );
