@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // const URL = window.origin;
 const URL = 'http://localhost:5000'
-const FETCH_API_ENDPOINT = `${URL}/api/fetch?table=`;
+const FETCH_API_ENDPOINT = `${URL}/api/fetch/`;
 
 const dataReducer = (state, action) => {
     switch (action.type) {
@@ -11,15 +11,21 @@ const dataReducer = (state, action) => {
             return {
                 ...state,
                 isLoading: true,
-                isError: false
+                isError: false,
+                request: action.payload
             };
         case 'DATA_FETCH_SUCCESS':
             return {
                 ...state,
-                isLoading: false,
-                isError: false,
                 content: action.payload.content,
                 columns: action.payload.columns,
+            };
+        case 'DATA_FETCH_ARRANGED':
+            return {
+                ...state,
+                isLoading: false,
+                isError: false,
+                arrangedContent: action.payload
             };
         case 'DATA_FETCH_ERROR':
             return {
@@ -33,28 +39,35 @@ const dataReducer = (state, action) => {
 }
 
 
-const useFetchData = () => {
+const useFetchData = dataArrangerCallback => {
     const [data, dispatchData] = React.useReducer(
         dataReducer,
-        {columns: [], content:[], isLoading: false, isError: false}
+        {request: {}, columns: [], content: [], arrangedContent: [], isLoading: false, isError: false}
     );
 
-    const [fetchType, setFetchType] = React.useState('class');
+    const [fetchArgs, setFetchArgs] = React.useState({type: 'class', filterId: null});
 
     const [url, setUrl] = React.useState(
-        `${FETCH_API_ENDPOINT}${fetchType}`
+        `${FETCH_API_ENDPOINT}${fetchArgs.type}`
     );
 
     React.useEffect(() => {
-        setUrl(`${FETCH_API_ENDPOINT}${fetchType}`);
-    }, [fetchType]);
+        if (!fetchArgs.filterId)
+            setUrl(`${FETCH_API_ENDPOINT}${fetchArgs.type}`);
+        else
+            setUrl(`${FETCH_API_ENDPOINT}${fetchArgs.type}?upper_id=${fetchArgs.filterId}`);
+    }, [fetchArgs]);
+
 
     const handleFetchData = React.useCallback(async () => {
-        dispatchData({ type: 'DATA_FETCH_INIT' });
+        dispatchData({ type: 'DATA_FETCH_INIT', payload: fetchArgs });
         try {
             const result = await axios.get(url);
-            dispatchData({ type: 'DATA_FETCH_SUCCESS', payload: result.data })
-        } catch {
+            dispatchData({ type: 'DATA_FETCH_SUCCESS', payload: result.data });
+            const arrangedContent = dataArrangerCallback({type: fetchArgs.type, id: fetchArgs.filterId, cols: result.data.columns, content: result.data.content, prevContent: data.arrangedContent});
+            dispatchData({ type: 'DATA_FETCH_ARRANGED', payload: arrangedContent });
+        } catch (err) {
+            console.log(err);
             dispatchData({ type: 'DATA_FETCH_ERROR' });
         }
     }, [url]);
@@ -67,7 +80,7 @@ const useFetchData = () => {
     //     setFetchType(event.target.value);
     // }
 
-    return [setFetchType, data];
+    return [setFetchArgs, data];
 };
 
 export default useFetchData;

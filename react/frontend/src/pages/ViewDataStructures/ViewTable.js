@@ -46,7 +46,7 @@ import Alert from 'react-bootstrap/Alert'
 //                   }
 //               ]
 
-const arrangeData = (data, cols) => data.map(row => (
+const arrangeData = ({content, cols}) => content.map(row => (
     {
         key: `row-${row[0]}`,
         cells: row.map((value, index) => (
@@ -89,20 +89,23 @@ const tabs = [
 ]
 
 const ViewTable = () => {
-    const [fetchData, data] = useFetchData();
+    const [fetchData, data] = useFetchData(arrangeData);
+    const [page, setPage] = React.useState(1);
+
+    React.useEffect(() => {
+        setPage(1);
+    }, [data.arrangedContent]);
 
     return (
         <div className="table">
-            <Tabs tabs={tabs} onSelect={selected => {
-                fetchData(selected.label);
-            }} />
+            <Tabs tabs={tabs} onSelect={selected => fetchData({type: selected.label})} />
             {!data.isError ?
                 <DynamicTable
                     head={{cells:arrangeColumns(data.columns)}}
-                    rows={arrangeData(data.content, data.columns)}
+                    rows={data.arrangedContent}
                     defaultPage={1}
                     rowsPerPage={10}
-                    page={1}
+                    page={page}
                     loadingSpinnerSize="large"
                     isLoading={data.isLoading}
                     isFixedSize

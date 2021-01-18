@@ -73,16 +73,25 @@ class DBInterface:
         self.cur.execute("SELECT * FROM genere")
         return [c for c in self.cur]
 
-    def list_families(self) -> List[Tuple]:
-        self.cur.execute("SELECT * FROM famiglia")
+    def list_families(self, class_id: int = None) -> List[Tuple]:
+        if class_id:
+            self.cur.execute("SELECT * FROM famiglia WHERE genere_id=(?)", [class_id])
+        else:
+            self.cur.execute("SELECT * FROM famiglia")
         return [f for f in self.cur]
 
-    def list_species(self) -> List[Tuple]:
-        self.cur.execute("SELECT * FROM specie")
+    def list_species(self, family_id: int = None) -> List[Tuple]:
+        if family_id:
+            self.cur.execute("SELECT * FROM specie WHERE famiglia_id=(?)", [family_id])
+        else:
+            self.cur.execute("SELECT * FROM specie")
         return [s for s in self.cur]
 
-    def list_specimens(self) -> List[Tuple]:
-        self.cur.execute("SELECT id, data_ritrovamento, luogo_ritrovamento, stato_ritrovamento, condizioni_ritrovamento, specie_id FROM esemplare")
+    def list_specimens(self, species_id: int = None) -> List[Tuple]:
+        if species_id:
+            self.cur.execute("SELECT id, data_ritrovamento, luogo_ritrovamento, stato_ritrovamento, condizioni_ritrovamento, specie_id FROM esemplare WHERE specie_id=(?)", [species_id])
+        else:
+            self.cur.execute("SELECT id, data_ritrovamento, luogo_ritrovamento, stato_ritrovamento, condizioni_ritrovamento, specie_id FROM esemplare")
         return [s for s in self.cur]
 
     def insert_class(self, class_name: str) -> None:

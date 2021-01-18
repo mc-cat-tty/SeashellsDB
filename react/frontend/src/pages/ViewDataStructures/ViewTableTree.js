@@ -4,6 +4,7 @@ import Spinner from '@atlaskit/spinner'
 import useFetchData from '../API/FetchApi';
 import Alert from "react-bootstrap/Alert";
 
+
 // const data = {
 //   "children": [
 //     {
@@ -157,7 +158,9 @@ import Alert from "react-bootstrap/Alert";
 
 const headers = ["name", "id", "type"];
 
-const arrangeData = (type, data, cols) => data.map(row => (
+const hierarchy = ['class', 'family', 'species', 'specimen'];
+
+const arrangeData = (type, content, cols) => content.map(row => (
     {
         'name': row[cols.indexOf('nome')],
         'id': row[cols.indexOf('id')],
@@ -166,41 +169,65 @@ const arrangeData = (type, data, cols) => data.map(row => (
     }
 ));
 
-const ViewTableTree = () => {
-  const [fetchData, data] = useFetchData();
-  let type = 'class';
-  React.useEffect(() => {
-      fetchData(type);
-  }, []);
 
-  return (
-    <div className="tabletree">
-        <TableTree
-            headers={headers}
-            columns={headers}
-            columnWidths={['700px', '700px', '700px']}
-        >
-            {data.isLoading && <div style={{position: 'relative', left: '45%', top: '5px'}}> <Spinner size='large' /> </div>}
-            {!data.isLoading &&
-                <Rows
-                items={arrangeData(type, data.content, data.columns)}
-                render={({name, id, type, children}) => (
-                    <Row
+const manageData = ({type, id, content, cols, prevContent}) => {
+    return arrangeData(type, content, cols);
+    // if (type === hierarchy[0]) {
+    //     return arrangeData(type, content, cols);
+    // }
+    // else if (type === hierarchy[1]) {
+    //     const i = prevContent.findIndex(ele => (ele.id === id));
+    //     ids[1] = i;
+    //     prevContent[i].children = arrangeData(type, content, cols);
+    //     return prevContent;
+    // }
+    // else if (type === hierarchy[2]) {
+    //     const i = prevContent[ids[1]].children.findIndex(ele => (ele.id === id));
+    //     prevContent[ids[1]].children[i].children = arrangeData(type, content, cols);
+    //     return prevContent;
+    // }
+}
+
+
+const ViewTableTree = () => {
+    const [fetchData, data] = useFetchData(manageData);
+
+    React.useEffect(() => {
+      fetchData({type: 'class'});
+    }, []);
+
+    return (
+        <div className="tabletree">
+            <TableTree
+                headers={headers}
+                columns={headers}
+                columnWidths={['700px', '700px', '700px']}
+            >
+                {data.isLoading && <div style={{position: 'relative', left: '45%', top: '5px'}}> <Spinner size='large' /> </div>}
+                {!data.isLoading &&
+                    <Rows
+                    items={data.arrangedContent}
+                    render={({name, id, type, children}) => (
+                        <Row
                         itemId={name}
                         items={children}
-                        hasChildren={children.length > 0}
-                        onExpand={() => {console.log('test')}}
-                    >
+                        hasChildren={type !== 'specimen'}
+                        onExpand={() => {
+                            if (type !== 'specimen') {
+                                fetchData({type: hierarchy[hierarchy.indexOf(type) + 1], filterId: id});
+                            }
+                        }}
+                        >
                         <Cell singleLine>{name}</Cell>
                         <Cell singleLine>{id}</Cell>
                         <Cell singleLine>{type}</Cell>
                     </Row>
-                )}/>
-            }
-            {data.isError && <Alert key='bootsrap-alert-1' variant='danger'> Server error :\ </Alert>}
-        </TableTree>
-    </div>
-  );
+                    )}/>
+                }
+                {data.isError && <Alert key='bootsrap-alert-1' variant='danger'> Server error :\ </Alert>}
+            </TableTree>
+        </div>
+    );
 }
 
 export default ViewTableTree;
