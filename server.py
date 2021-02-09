@@ -107,4 +107,4 @@ if __name__ == '__main__':
     parser.add_argument("-p", "--password", help="MariaDB (MySQL) password", type=str, dest="password")
     args = parser.parse_args()
     dbi = DBInterface("127.0.0.1", 3306, "writeUser", args.password, "conchiglie")
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=True)
