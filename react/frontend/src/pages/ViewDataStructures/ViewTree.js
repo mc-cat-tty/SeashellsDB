@@ -3,6 +3,7 @@ import { Group } from '@visx/group';
 import { Tree, hierarchy } from '@visx/hierarchy';
 import { LinkHorizontal } from '@visx/shape';
 import { LinearGradient } from '@visx/gradient';
+import useFetchData from '../API/FetchApi';
 
 const peach = '#fd9b93';
 const pink = '#fe6e9e';
@@ -159,8 +160,8 @@ const RootNode = ({node}) => (
 //     return tree;
 // };
 
-const SvgTree = ({width, height, margin = defaultMargin}) => {
-    const data = useMemo(() => hierarchy(rawTree), []);
+const SvgTree = ({width, height, rawData, margin = defaultMargin}) => {
+    const data = useMemo(() => hierarchy(rawData), []);
     const yMax = height - margin.top - margin.bottom;
     const xMax = width - margin.left - margin.right;
 
@@ -202,9 +203,20 @@ const totalChildren = tree => {
     return num;
 }
 
+const arrangeData = ({type, id, content, cols, prevContent}) => ({
+    name: "Mollusca",
+    children: content.map(ele => (
+        {
+            name: ele[0],
+            children: ele[2]
+        }
+    ))
+});
+
 const ViewTree = () => {
+    const [fetchData, data] = useFetchData(arrangeData);
+
     const parentRef = React.useRef();
-    console.log(totalChildren(rawTree));
     const parentHeight = totalChildren(rawTree, 0)*50;
     const [parentWidth, setParentWidth] = React.useState(100);
 
@@ -214,9 +226,13 @@ const ViewTree = () => {
         }
     }, [parentRef]);
 
+    React.useEffect(() => {
+        fetchData({type: "hierarchy"});
+    }, []);
+
     return(
         <div className="tree" ref={parentRef}>
-            <SvgTree width={parentWidth} height={parentHeight}/>
+            <SvgTree width={parentWidth} height={parentHeight} rawData={data.arrangedContent}/>
         </div>
     );
 }

@@ -75,6 +75,13 @@ def fetch(table_str):
 #     except:
 #         return "internal error", 500
 
+@app.route("/api/fetch/hierarchy", methods=["GET"])
+def fetch_hierarchy():
+    return {
+        'content': dbi.list_hierarchy(),
+        'columns': dbi.get_columns()
+    }
+
 @app.after_request
 def add_header(response):
     response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'

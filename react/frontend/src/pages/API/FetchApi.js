@@ -63,6 +63,7 @@ const useFetchData = dataArrangerCallback => {
         dispatchData({ type: 'DATA_FETCH_INIT', payload: fetchArgs });
         try {
             const result = await axios.get(url);
+            console.log(result.data.content);
             dispatchData({ type: 'DATA_FETCH_SUCCESS', payload: result.data });
             const arrangedContent = dataArrangerCallback({type: fetchArgs.type, id: fetchArgs.filterId, cols: result.data.columns, content: result.data.content, prevContent: data.arrangedContent});
             dispatchData({ type: 'DATA_FETCH_ARRANGED', payload: arrangedContent });
