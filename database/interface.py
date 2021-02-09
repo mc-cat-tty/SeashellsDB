@@ -9,7 +9,8 @@ __author__ = "Francesco Mecatti"
 import logging
 import mariadb
 from enum import Enum, auto
-from typing import List, Optional, Tuple
+from collections import defaultdict
+from typing import List, Optional, Tuple, DefaultDict, Dict
 
 LOGGING_FILENAME: str = "database_interface.log"
 
@@ -66,21 +67,42 @@ class DBInterface:
         with open(filename, "rb") as file:
             return file.read()
 
+    def get_columns(self) -> List[str]:
+        return [column[0] for column in self.cur.description]
+
     def list_classes(self) -> List[Tuple]:
         self.cur.execute("SELECT * FROM genere")
         return [c for c in self.cur]
 
-    def list_families(self) -> List[Tuple]:
-        self.cur.execute("SELECT * FROM famiglia")
+    def list_families(self, class_id: int = None) -> List[Tuple]:
+        if class_id:
+            self.cur.execute("SELECT * FROM famiglia WHERE genere_id=(?)", [class_id])
+        else:
+            self.cur.execute("SELECT * FROM famiglia")
         return [f for f in self.cur]
 
-    def list_species(self) -> List[Tuple]:
-        self.cur.execute("SELECT * FROM specie")
+    def list_species(self, family_id: int = None) -> List[Tuple]:
+        if family_id:
+            self.cur.execute("SELECT * FROM specie WHERE famiglia_id=(?)", [family_id])
+        else:
+            self.cur.execute("SELECT * FROM specie")
         return [s for s in self.cur]
 
-    def list_specimens(self) -> List[Tuple]:
-        self.cur.execute("SELECT * FROM esemplare")
+    def list_specimens(self, species_id: int = None) -> List[Tuple]:
+        if species_id:
+            self.cur.execute("SELECT id, data_ritrovamento, luogo_ritrovamento, stato_ritrovamento, condizioni_ritrovamento, specie_id FROM esemplare WHERE specie_id=(?)", [species_id])
+        else:
+            self.cur.execute("SELECT id, data_ritrovamento, luogo_ritrovamento, stato_ritrovamento, condizioni_ritrovamento, specie_id FROM esemplare")
         return [s for s in self.cur]
+
+    def list_hierarchy(self) -> Dict[str, Dict[str, List]]:
+        self.cur.execute("select genere.nome, famiglia.nome, specie.nome from genere right join famiglia on genere.id = famiglia.genere_id right join specie on famiglia.id = specie.famiglia_id;")
+        d: DefaultDict = defaultdict(defaultdict)
+        for row in self.cur:
+            if not d[row[0]].get(row[1]):
+                d[row[0]][row[1]] = list()
+            d[row[0]][row[1]].append(row[2])
+        return d
 
     def insert_class(self, class_name: str) -> None:
         logging.debug(f'INSERT INTO genere (nome) VALUES ({class_name})')
