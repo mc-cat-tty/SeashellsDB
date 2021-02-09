@@ -1,7 +1,10 @@
 FROM python:3.7
 
-COPY database/interface.py /database/app/
+WORKDIR /app
+
+COPY database/interface.py /app/database/
 COPY requirements.txt /app/
+COPY server.py /app/
 
 RUN pip install -r /app/requirements.txt
 RUN pip install gunicorn
