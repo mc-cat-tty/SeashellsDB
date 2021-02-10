@@ -1,0 +1,28 @@
+FROM mariadb/server:10.3
+
+COPY database/data.sql /
+
+ENV MYSQL_ROOT_PASSWORD fermi
+ENV MYSQL_DATABASE conchiglie
+ENV MYSQL_USER writeuser
+ENV MYSQL_PASSWORD fermi
+
+CMD exec mysqld
+CMD exec mysql -u writeUser -p fermi conchiglie < data.sql
+
+FROM python:3.7
+
+WORKDIR /app
+
+COPY database/interface.py /app/database/
+COPY requirements.txt /app/
+COPY server.py /app/
+
+RUN pip install -r /app/requirements.txt
+RUN pip install gunicorn
+
+ENV PORT 8080
+ENV APP_MYSQL_PASSWORD fermi
+
+EXPOSE $PORT
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 server:app

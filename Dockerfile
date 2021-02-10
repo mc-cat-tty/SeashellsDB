@@ -1,15 +1,11 @@
-FROM python:3.7
+FROM mariadb:latest
+  
+COPY database/data.sql /docker-entrypoint-initdb.d/
 
-WORKDIR /app
+ENV MYSQL_ROOT_PASSWORD fermi
+ENV MYSQL_DATABASE conchiglie
+ENV MYSQL_USER writeuser
+ENV MYSQL_PASSWORD fermi
 
-COPY database/interface.py /app/database/
-COPY requirements.txt /app/
-COPY server.py /app/
+#CMD mysql --user="root" --password="$MYSQL_ROOT_PASSWORD" --database="$MYSQL_DATABASE" < /docker-entrypoint-initdb.d/data.sql
 
-RUN pip install -r /app/requirements.txt
-RUN pip install gunicorn
-
-ENV PORT 8080
-
-EXPOSE $PORT
-CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 server:app

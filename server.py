@@ -1,3 +1,4 @@
+import os
 from flask import request
 from flask_api import FlaskAPI
 from typing import Tuple, List
@@ -106,5 +107,5 @@ if __name__ == '__main__':
     parser: argparse.ArgumentParser = argparse.ArgumentParser()
     parser.add_argument("-p", "--password", help="MariaDB (MySQL) password", type=str, dest="password")
     args = parser.parse_args()
-    dbi = DBInterface("127.0.0.1", 3306, "writeUser", args.password, "conchiglie")
+    dbi = DBInterface("127.0.0.1", 3306, "writeUser", args.password or os.getenv("APP_MYSQL_PASSWORD"), "conchiglie")
     app.run(host='0.0.0.0', port=8080, debug=True)
