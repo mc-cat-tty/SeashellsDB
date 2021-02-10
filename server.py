@@ -7,8 +7,8 @@ import argparse
 
 app = FlaskAPI(__name__)
 app.config['HOST'] = '0.0.0.0'
-app.config['DEBUG'] = True
-app.config['ENV'] = 'development'
+#app.config['DEBUG'] = True
+#app.config['ENV'] = 'development'
 
 dbi: DBInterface = None
 
@@ -107,5 +107,7 @@ if __name__ == '__main__':
     parser: argparse.ArgumentParser = argparse.ArgumentParser()
     parser.add_argument("-p", "--password", help="MariaDB (MySQL) password", type=str, dest="password")
     args = parser.parse_args()
-    dbi = DBInterface("127.0.0.1", 3306, "writeUser", args.password or os.getenv("APP_MYSQL_PASSWORD"), "conchiglie")
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    dbi = DBInterface("127.0.0.1", 3306, "writeUser", args.password, "conchiglie")
+    app.run(host='0.0.0.0', port=5000, debug=True)
+else:  # Started from gunicorn
+    dbi = DBInterface(os.getenv("APP_MYSQL_ADDRESS"), 3306, os.getenv("APP_MYSQL_USERNAME"), os.getenv("APP_MYSQL_PASSWORD"), "conchiglie")
